@@ -34,13 +34,12 @@ void ASpellProjectileBase::BeginPlay()
         APawn* InstigatorPawn = GetInstigator();
         if (InstigatorPawn && InstigatorPawn->IsLocallyControlled())
         {
-            // We hide the mesh and stop collision locally so the shooter 
-            // only interacts with their smooth LocalFake.
-            SetActorHiddenInGame(true);
+            // We hide the mesh and stop collision locally so the shooter only interacts with their smooth LocalFake
+            //SetActorHiddenInGame(true);
         }
     }
 
-    // Making our mesh components collider trigger our OnHit on collision.
+    // Making our mesh components collider trigger our OnHit on collision
     MeshComp->OnComponentHit.AddDynamic(this, &ASpellProjectileBase::OnHit);
 }
 
@@ -76,10 +75,27 @@ void ASpellProjectileBase::Explosion(UPrimitiveComponent* HitComp, AActor* Other
         ASC->ExecuteGameplayCue(HitCueTag, Parameters);
     }
 
+    // For some reason this returns a flipped sign for z axis after telekinesis. Could have something to do with projectile component?
     FVector ProjectileDir = GetVelocity().GetSafeNormal();
 
-    // Lift explosion off ground to avoid spawning post hit actor inside ground
-    FVector Location = Hit.ImpactPoint - (ProjectileDir * 20.0f);;
+
+    /* 
+    When the projectiles mesh is simulating physics, the regular offset doesnt work.
+    I presume this is because shortly after hitting the ground, the velocity of the projectile changes due to bounce.
+    Reverse (+ ProjectileDir) is not enough to offset it.
+    We avoid Hit.ImpactNormal normally because the player can spawn the projectile inside a wall.
+    However, since the mesh will only be simulating physics after it has already been spawned (at the moment only due to Telekinesis)
+    We are safe to use Hit.ImpactNormal.
+    */
+    FVector Location;
+    if (!MeshComp->IsSimulatingPhysics())
+    {
+        Location = Hit.ImpactPoint - (ProjectileDir * 20.0f);
+    }
+    else
+    {
+        Location = Hit.ImpactPoint + (Hit.ImpactNormal * 20.0f);
+    }
 
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = this;

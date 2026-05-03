@@ -61,13 +61,10 @@ void UGA_CastProjectile::OnMontageEventReceived(FGameplayEventData Payload)
     // Could use a different BP for the client fake
     if (HasAuthority(&CurrentActivationInfo))
     {
-        ASpellProjectileBase* ServerProjectile = GetWorld()->SpawnActorDeferred<ASpellProjectileBase>(
-            ProjectileBP, FTransform(SpawnRotation, SpawnLocation), CasterActor, CasterPawn);
+        AActor* ServerProjectile = GetWorld()->SpawnActorDeferred<AActor>(ProjectileBP, FTransform(SpawnRotation, SpawnLocation), CasterActor, CasterPawn);
 
         if (ServerProjectile)
         {
-            ServerProjectile->SetOwner(CasterActor);
-
             ServerProjectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
         }
     }
@@ -77,6 +74,12 @@ void UGA_CastProjectile::OnMontageEventReceived(FGameplayEventData Payload)
         // TODO: Make local projectile get destroyed when server one does (desync at times causes local to live too long)
         // Steps: Add GA prediction key as variable to server projectile and add the same key to a map of fake actors that lives in playerstate or a subsystem
         // prediction key has to be carried over to GCN_Explosion, where the key will be used to search the map of fake actors for the one to destroy
-        AActor* LocalFake = GetWorld()->SpawnActor<AActor>(ProjectileBP, SpawnLocation, SpawnRotation);
+        //AActor* LocalFake = GetWorld()->SpawnActorDeferred<AActor>(ProjectileBP, FTransform(SpawnRotation, SpawnLocation), nullptr, nullptr);
+
+        //if (LocalFake)
+        //{
+        //    LocalFake->SetReplicates(false);
+        //    LocalFake->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+        //}
     }
 }
