@@ -49,14 +49,6 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Death")
 	void HandleDeath();
 
-	/** Saving starting abilities from data assets to avoid having abilities in characers memory at all times */
-	UPROPERTY(BlueprintReadOnly, Category = "AbilitySystem")
-	TArray<TSubclassOf<UGameplayAbility>> SavedStartingAbilities;
-
-	/** Definitions for each ability which we grab the ability class from */
-	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
-	TArray<TObjectPtr<USpellDefinition>> StartingAbilities;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
@@ -72,6 +64,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	/** Definitions for each ability which we grab the ability class from */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AbilitySystem")
+	TArray<TObjectPtr<USpellDefinition>> StartingAbilities;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
