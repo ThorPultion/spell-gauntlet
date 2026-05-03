@@ -117,26 +117,6 @@ void ASpellCharacterBase::PossessedBy(AController* NewController)
     {
         OnRep_PlayerState();
     }
-
-    SpellASC->ClearAllAbilities();
-
-    for (const TObjectPtr<USpellDefinition>& SpellDef : StartingAbilities)
-    {
-        if (SpellDef)
-        {
-            TSubclassOf<UGameplayAbility> AbilityClass = SpellDef->SpellAbilityClass.Get();
-
-            // Backup getter, if the defs class hasnt been loaded in say AssetManager yet
-            if (!AbilityClass)
-            {
-                AbilityClass = SpellDef->SpellAbilityClass.LoadSynchronous();
-            }
-
-            SavedStartingAbilities.Add(AbilityClass);
-        }
-    }
-
-    SpellASC->Server_GrantAbilities(SavedStartingAbilities);
 }
 
 void ASpellCharacterBase::OnRep_PlayerState()
@@ -155,6 +135,15 @@ void ASpellCharacterBase::InitAbilityActorInfo()
         SpellASC = Cast<USpellAbilitySystemComponent>(PS->GetAbilitySystemComponent());
 
         SpellASC->InitAbilityActorInfo(PS, this);
+
+        if (HasAuthority())
+        {
+            SpellASC->ClearAllAbilities();
+            // Could expose grantabilities to grant directly as we are doing this only on authority
+            // Performance gain negligible
+            SpellASC->Server_GrantAbilities(StartingAbilities);
+        }
+
         SpellASC->RegisterGameplayTagEvent(SpellGameplayTags::State_Dead).AddUObject(this, &ASpellCharacterBase::OnDeadTagChanged);
 
         // Playerstate also contains the attributeset

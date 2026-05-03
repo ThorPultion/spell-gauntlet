@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "SpellAbilitySystemComponent.generated.h"
 
+class USpellDefinition;
 /**
  * 
  */
@@ -26,7 +27,7 @@ public:
 	void SendAbilitiesChangedEvent();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "AbilitySystem")
-	void Server_GrantAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant);
+	void Server_GrantAbilities(const TArray<USpellDefinition*>& AbilitiesToGrant);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "AbilitySystem")
 	void Server_RemoveAbilities(const TArray<FGameplayAbilitySpecHandle>& AbilityHandlesToRemove);
@@ -38,7 +39,7 @@ protected:
 	UFUNCTION()
 	void OnRep_AbilitySyncCounter();
 
-	TArray<FGameplayAbilitySpecHandle> GrantAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToGrant);
+	TArray<FGameplayAbilitySpecHandle> GrantAbilities(const TArray<USpellDefinition*>& AbilitiesToGrant);
 
 	void RemoveAbilities(const TArray<FGameplayAbilitySpecHandle>& AbilityHandlesToRemove);
 
