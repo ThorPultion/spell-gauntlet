@@ -9,6 +9,8 @@
 #include "SpellCharacterBase.generated.h"
 
 class USpringArmComponent;
+class UCameraComponent;
+class UPhysicsConstraintComponent;
 class USpellAttributeSet;
 class USpellDefinition;
 
@@ -32,6 +34,18 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> FirstPersonMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UCameraComponent> FirstPersonCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USpringArmComponent> CameraTrackingArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UStaticMeshComponent> CameraTrackingComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UPhysicsConstraintComponent> TelekinesisConstraint;
 
 	//** Called when GAS setup is ready on character */
 	UFUNCTION(BlueprintImplementableEvent)
@@ -77,6 +91,9 @@ public:
 	/** Replicated property set by knockback ability to carry over intended momentum */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
 	FVector CorpseLaunchVelocity = FVector::ZeroVector;
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Telekinesis")
+	TWeakObjectPtr<AActor> TelekinesizedActor = nullptr;
 
 private:
 
