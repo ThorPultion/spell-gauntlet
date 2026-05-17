@@ -12,6 +12,7 @@
 #include "SpellGauntlet/CoreSystems/SpellGameplayTags.h"
 #include "SpellGauntlet/Gameplay/AbilitySystem/SpellDefinition.h"
 #include "SpellGauntlet/Player/SpellPlayerSubsystem.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 
 // Sets default values
 ASpellCharacterBase::ASpellCharacterBase()
@@ -23,6 +24,18 @@ ASpellCharacterBase::ASpellCharacterBase()
 
     FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
     FirstPersonMesh->SetupAttachment(SpringArmComponent);
+
+    FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+    FirstPersonCamera->SetupAttachment(SpringArmComponent); // Attaches to your character's main SpringArm
+
+    CameraTrackingArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraTrackingArm"));
+    CameraTrackingArm->SetupAttachment(FirstPersonCamera);
+
+    CameraTrackingComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CameraTrackingComp"));
+    CameraTrackingComp->SetupAttachment(CameraTrackingArm);
+
+    TelekinesisConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TelekinesisConstraint"));
+    TelekinesisConstraint->SetupAttachment(CameraTrackingComp);
 }
 
 void ASpellCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
